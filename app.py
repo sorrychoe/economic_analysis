@@ -11,7 +11,7 @@ df = pd.read_excel('./econo_columns_20170510-20220509.xlsx')
 st.set_page_config(layout="centered", page_icon="📰", page_title="economic columns")
     
 st.title("경제 뉴스 칼럼 키워드 분석")
-st.subheader("문재인 정부 재임 기간(20170510-20220509) 동안 경제 뉴스의 칼럼 키워드를 분석합니다.")
+st.text("문재인 정부 재임 기간(20170510-20220509) 동안 경제 뉴스의 칼럼 키워드를 분석합니다.")
 
 
 def space(num_lines):
