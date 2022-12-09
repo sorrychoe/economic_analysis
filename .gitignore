@@ -2,3 +2,7 @@
 /*.png
 
 /news_topic.xlsx
+
+/__pycache__/
+
+/BigKindsParser.py
