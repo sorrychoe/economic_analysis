@@ -36,7 +36,7 @@ def main():
         news_key = bkp.duplication_remover(news_key)
         key = bkp.word_counter(news_key)
         news_key = bkp.counter_to_DataFrame(key)
-        wc = WordCloud(font_path = 'C:/Users/cjsso/AppData/Local/Microsoft/Windows/Fonts/NanumBarunGothic.ttf',
+        wc = WordCloud(font_path = '/NanumBarunGothic.ttf',
                         width = 500,
                         height = 500,
                         background_color='white').generate_from_frequencies(news_key.set_index('단어').to_dict()["빈도"])
