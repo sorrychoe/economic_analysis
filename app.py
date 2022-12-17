@@ -1,9 +1,11 @@
 import BigKindsParser as bkp
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from wordcloud import WordCloud
+
 import streamlit as st
 
 df = pd.read_excel('./econo_columns_20170510-20220509.xlsx')
@@ -20,16 +22,16 @@ def space(num_lines):
 
 def main():
 
-    press = ['전체 언론사 칼럼 빈도', '전체 언론사 키워드', '한국경제', '매일경제', '서울경제', '파이낸셜뉴스', '헤럴드경제']
-    symbols = st.selectbox("Choose stocks to visualize",press)
+    press = ['전체 언론사', '한국경제', '매일경제', '서울경제', '파이낸셜뉴스', '헤럴드경제']
+    symbols = st.selectbox("Choose stocks to visualize", press)
 
     space(2)
     
-    if symbols == '전체 언론사 칼럼 빈도':
+    if symbols == '전체 언론사':
         st.image('./press.png')
-    
-    elif symbols == '전체 언론사 키워드' :
-    
+        
+        space(1)
+         
         df_keywords = df['키워드']
         keywords = bkp.keywords_list(df_keywords)
         news_key = bkp.keyword_parser(keywords)
