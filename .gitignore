@@ -1,14 +1,19 @@
+# ipynb file
+/__pycache__/
+
+/.ipynb_checkpoints/
+
+
+# python file
+/BigKindsParser.py
+
+/app.py
+
+
+#others
 
 /*.png
 
 /news_topic.xlsx
 
-/__pycache__/
-
-/BigKindsParser.py
-
-/.ipynb_checkpoints/
-
 /NanumBarunGothic.ttf
-
-
