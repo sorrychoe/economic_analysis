@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>언론사 빈도 확인</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="economic_columns_clustering_files/libs/clipboard/clipboard.min.js"></script>
+<script src="economic_columns_clustering_files/libs/quarto-html/quarto.js"></script>
+<script src="economic_columns_clustering_files/libs/quarto-html/popper.min.js"></script>
+<script src="economic_columns_clustering_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="economic_columns_clustering_files/libs/quarto-html/anchor.min.js"></script>
+<link href="economic_columns_clustering_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="economic_columns_clustering_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="economic_columns_clustering_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="economic_columns_clustering_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="economic_columns_clustering_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">언론사 빈도 확인</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:37:23.093529Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:37:17.069708Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BigKindsParser <span class="im">as</span> bkp</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> wordcloud <span class="im">import</span> WordCloud</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:57:23.767675Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:57:23.754709Z&quot;}" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"font.family"</span>] <span class="op">=</span> <span class="st">"Malgun Gothic"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> <span class="dv">10</span>,<span class="dv">10</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(font<span class="op">=</span><span class="st">"Malgun Gothic"</span>, rc<span class="op">=</span>{<span class="st">"axes.unicode_minus"</span>:<span class="va">False</span>}, style<span class="op">=</span><span class="st">'white'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:37:36.147998Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:37:23.191768Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_excel(<span class="st">'./econo_columns_20170510-20220509.xlsx'</span>, engine <span class="op">=</span> <span class="st">"openpyxl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-12T04:45:00.579542Z&quot;,&quot;start_time&quot;:&quot;2022-12-12T04:45:00.567573Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_key <span class="op">=</span> bkp.press_counter(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-12T04:45:00.942498Z&quot;,&quot;start_time&quot;:&quot;2022-12-12T04:45:00.707045Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sns.barplot(data <span class="op">=</span> df_key, x <span class="op">=</span> <span class="st">'기사'</span>, y <span class="op">=</span> <span class="st">'언론사'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.figure(facecolor <span class="op">=</span> <span class="st">'white'</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 1000x1000 with 0 Axes&gt;</code></pre>
+</div>
+</div>
+<section id="이상치-확인" class="level2">
+<h2 class="anchored" data-anchor-id="이상치-확인">이상치 확인</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:44:48.696625Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:44:48.681024Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>outlier <span class="op">=</span> df[df[<span class="st">'언론사'</span>] <span class="op">==</span> <span class="st">'아시아경제'</span>] <span class="co">##아시아 경제 기사 추가 크롤링 필요</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:44:49.674876Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:44:49.653460Z&quot;}" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>outlier[<span class="st">'일자'</span>] <span class="co">#아시아경제 기사는 2021년부터 빅카인즈에 기사를 업로드 --&gt; 2017~2020년 기사는 별도 크롤링 필요</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>238     20220415
+387     20220331
+398     20220330
+639     20220307
+898     20220209
+1400    20211217
+2334    20210910
+2711    20210804
+2789    20210727
+2895    20210716
+3094    20210625
+3231    20210611
+3371    20210528
+3501    20210514
+3639    20210430
+3663    20210428
+3733    20210421
+3820    20210413
+4376    20210215
+4544    20210127
+Name: 일자, dtype: int64</code></pre>
+</div>
+</div>
+</section>
+<section id="키워드-빈도" class="level2">
+<h2 class="anchored" data-anchor-id="키워드-빈도">키워드 빈도</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:44:54.237870Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:44:54.227735Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_keywords <span class="op">=</span> df[<span class="st">'키워드'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:44:54.438962Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:44:54.414475Z&quot;}" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>keywords <span class="op">=</span> bkp.keywords_list(df_keywords)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:44:58.649922Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:44:54.635774Z&quot;}" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>news_key <span class="op">=</span> bkp.keyword_parser(keywords)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>news_key <span class="op">=</span> bkp.duplication_remover(news_key)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>key <span class="op">=</span> bkp.word_counter(news_key)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:44:59.053722Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:44:58.660005Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>news_key <span class="op">=</span> bkp.counter_to_DataFrame(key)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:02.427020Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:44:59.061223Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>wc <span class="op">=</span> WordCloud(font_path <span class="op">=</span> <span class="st">'./NanumBarunGothic.ttf'</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    width <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    background_color<span class="op">=</span><span class="st">'white'</span>).generate_from_frequencies(news_key.set_index(<span class="st">'단어'</span>).to_dict()[<span class="st">"빈도"</span>])</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(wc)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-13-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<section id="언론사별-키워드-분석-한경" class="level3">
+<h3 class="anchored" data-anchor-id="언론사별-키워드-분석-한경">언론사별 키워드 분석 –&gt; 한경</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:06.430465Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:05.496373Z&quot;}" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bkp.press_keywords_wordcloud(df, <span class="st">'한국경제'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-14-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="언론사별-키워드-분석-매경" class="level3">
+<h3 class="anchored" data-anchor-id="언론사별-키워드-분석-매경">언론사별 키워드 분석 –&gt; 매경</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:10.207550Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:09.174800Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bkp.press_keywords_wordcloud(df, <span class="st">'매일경제'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-15-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="언론사별-키워드-분석-서경" class="level3">
+<h3 class="anchored" data-anchor-id="언론사별-키워드-분석-서경">언론사별 키워드 분석 –&gt; 서경</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:14.132423Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:13.072564Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>bkp.press_keywords_wordcloud(df, <span class="st">'서울경제'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="언론사별-키워드-분석-파이낸셜" class="level3">
+<h3 class="anchored" data-anchor-id="언론사별-키워드-분석-파이낸셜">언론사별 키워드 분석 –&gt; 파이낸셜</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:17.650350Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:16.945465Z&quot;}" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>bkp.press_keywords_wordcloud(df, <span class="st">'파이낸셜뉴스'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-17-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="언론사별-키워드-분석-헤럴드" class="level3">
+<h3 class="anchored" data-anchor-id="언론사별-키워드-분석-헤럴드">언론사별 키워드 분석 –&gt; 헤럴드</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:21.015066Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:20.474348Z&quot;}" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>bkp.press_keywords_wordcloud(df, <span class="st">'헤럴드경제'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-18-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="tf-idf-분석" class="level2">
+<h2 class="anchored" data-anchor-id="tf-idf-분석">TF-IDF 분석</h2>
+<p>언론사별 용어 빈도는 비슷 –&gt; tf-idf를 통한 특징 추출 필요</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:37:48.667965Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:37:48.296449Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer <span class="co">#module import</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="한경" class="level3">
+<h3 class="anchored" data-anchor-id="한경">한경</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:31.822551Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:31.801275Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>han_words <span class="op">=</span> df[df[<span class="st">'언론사'</span>] <span class="op">==</span> <span class="st">'한국경제'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:32.225334Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:32.210183Z&quot;}" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>han_words <span class="op">=</span> han_words[<span class="st">'키워드'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:34.640530Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:32.411014Z&quot;}" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="op">=</span> TfidfVectorizer()</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>tdm <span class="op">=</span> tfidf.fit_transform(han_words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:35.323404Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:35.198025Z&quot;}" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>word_count1 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'단어'</span>: tfidf.get_feature_names(),</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'빈도'</span>: tdm.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).flat</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>}).sort_values(<span class="st">'빈도'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index(drop <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:39.691878Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:36.761591Z&quot;}" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>wc <span class="op">=</span> WordCloud(font_path <span class="op">=</span> <span class="st">'./NanumBarunGothic.ttf'</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    width <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    background_color<span class="op">=</span><span class="st">'white'</span>).generate_from_frequencies(word_count1.set_index(<span class="st">'단어'</span>).to_dict()[<span class="st">"빈도"</span>])</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(wc)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-24-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="매경" class="level3">
+<h3 class="anchored" data-anchor-id="매경">매경</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:43.148218Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:43.118480Z&quot;}" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>mail_words <span class="op">=</span> df[df[<span class="st">'언론사'</span>] <span class="op">==</span> <span class="st">'매일경제'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:43.319297Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:43.300395Z&quot;}" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>mail_words <span class="op">=</span> mail_words[<span class="st">'키워드'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:45.509197Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:43.482828Z&quot;}" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="op">=</span> TfidfVectorizer()</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>tdm <span class="op">=</span> tfidf.fit_transform(mail_words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:45.649307Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:45.517193Z&quot;}" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>word_count2 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'단어'</span>: tfidf.get_feature_names(),</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'빈도'</span>: tdm.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).flat</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>}).sort_values(<span class="st">'빈도'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index(drop <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:49.409715Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:46.513102Z&quot;}" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>wc <span class="op">=</span> WordCloud(font_path <span class="op">=</span> <span class="st">'./NanumBarunGothic.ttf'</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    width <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    background_color<span class="op">=</span><span class="st">'white'</span>).generate_from_frequencies(word_count2.set_index(<span class="st">'단어'</span>).to_dict()[<span class="st">"빈도"</span>])</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(wc)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-29-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="서경" class="level3">
+<h3 class="anchored" data-anchor-id="서경">서경</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:51.699644Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:51.677364Z&quot;}" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>seo_words <span class="op">=</span> df[df[<span class="st">'언론사'</span>] <span class="op">==</span> <span class="st">'서울경제'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:51.869930Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:51.854092Z&quot;}" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>seo_words <span class="op">=</span> seo_words[<span class="st">'키워드'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:54.182361Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:52.032275Z&quot;}" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="op">=</span> TfidfVectorizer()</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>tdm <span class="op">=</span> tfidf.fit_transform(seo_words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:54.290298Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:54.189503Z&quot;}" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>word_count3 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'단어'</span>: tfidf.get_feature_names(),</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'빈도'</span>: tdm.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).flat</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>}).sort_values(<span class="st">'빈도'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index(drop <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:57.140457Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:54.296920Z&quot;}" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>wc <span class="op">=</span> WordCloud(font_path <span class="op">=</span> <span class="st">'./NanumBarunGothic.ttf'</span>,</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    width <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    background_color<span class="op">=</span><span class="st">'white'</span>).generate_from_frequencies(word_count3.set_index(<span class="st">'단어'</span>).to_dict()[<span class="st">"빈도"</span>])</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(wc)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-34-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="파이낸셜" class="level3">
+<h3 class="anchored" data-anchor-id="파이낸셜">파이낸셜</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:59.324072Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:59.303146Z&quot;}" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fin_words <span class="op">=</span> df[df[<span class="st">'언론사'</span>] <span class="op">==</span> <span class="st">'파이낸셜뉴스'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:45:59.462273Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:59.450625Z&quot;}" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>fin_words <span class="op">=</span> fin_words[<span class="st">'키워드'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:01.187439Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:45:59.611065Z&quot;}" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="op">=</span> TfidfVectorizer()</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>tdm <span class="op">=</span> tfidf.fit_transform(fin_words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:01.297043Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:01.194761Z&quot;}" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>word_count4 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'단어'</span>: tfidf.get_feature_names(),</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'빈도'</span>: tdm.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).flat</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>}).sort_values(<span class="st">'빈도'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index(drop <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:04.129283Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:01.302971Z&quot;}" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>wc <span class="op">=</span> WordCloud(font_path <span class="op">=</span> <span class="st">'./NanumBarunGothic.ttf'</span>,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    width <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    background_color<span class="op">=</span><span class="st">'white'</span>).generate_from_frequencies(word_count4.set_index(<span class="st">'단어'</span>).to_dict()[<span class="st">"빈도"</span>])</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(wc)</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-39-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="헤럴드" class="level3">
+<h3 class="anchored" data-anchor-id="헤럴드">헤럴드</h3>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:13.051090Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:13.019126Z&quot;}" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>hero_words <span class="op">=</span> df[df[<span class="st">'언론사'</span>] <span class="op">==</span> <span class="st">'헤럴드경제'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:13.223784Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:13.201162Z&quot;}" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>hero_words <span class="op">=</span> hero_words[<span class="st">'키워드'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:14.733820Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:13.373156Z&quot;}" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="op">=</span> TfidfVectorizer()</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>tdm <span class="op">=</span> tfidf.fit_transform(hero_words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:14.841825Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:14.740907Z&quot;}" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>word_count5 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'단어'</span>: tfidf.get_feature_names(),</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'빈도'</span>: tdm.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).flat</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>}).sort_values(<span class="st">'빈도'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index(drop <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:17.633790Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:14.847297Z&quot;}" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>wc <span class="op">=</span> WordCloud(font_path <span class="op">=</span> <span class="st">'./NanumBarunGothic.ttf'</span>,</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    width <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    background_color<span class="op">=</span><span class="st">'white'</span>).generate_from_frequencies(word_count5.set_index(<span class="st">'단어'</span>).to_dict()[<span class="st">"빈도"</span>])</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(wc)</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-44-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:23.160054Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:23.141790Z&quot;}" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>words_df1 <span class="op">=</span> pd.concat([word_count1, word_count2], join<span class="op">=</span><span class="st">'outer'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:23.636369Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:23.617796Z&quot;}" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>words_df1.columns <span class="op">=</span> [<span class="st">'단어(한경)'</span>, <span class="st">'빈도(한경)'</span>, <span class="st">'단어(매경)'</span>, <span class="st">'빈도(매경)'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:24.026147Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:23.982635Z&quot;}" data-execution_count="44">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>words_df2 <span class="op">=</span> pd.concat([word_count3, word_count4, word_count5], join<span class="op">=</span><span class="st">'outer'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:24.367511Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:24.354944Z&quot;}" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>words_df2.columns <span class="op">=</span> [<span class="st">'단어(서경)'</span>, <span class="st">'빈도(서경)'</span>,<span class="st">'단어(파이낸셜)'</span>, <span class="st">'빈도(파이낸셜)'</span>,<span class="st">'단어(헤럴드)'</span>, <span class="st">'빈도(헤럴드)'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:24.785629Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:24.738074Z&quot;}" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>words_df <span class="op">=</span> pd.concat([words_df1, words_df2], join <span class="op">=</span> <span class="st">'outer'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-10-12T14:46:25.172315Z&quot;,&quot;start_time&quot;:&quot;2022-10-12T14:46:25.117889Z&quot;}" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>words_df.head(<span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="47">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">단어(한경)</th>
+<th data-quarto-table-cell-role="th">빈도(한경)</th>
+<th data-quarto-table-cell-role="th">단어(매경)</th>
+<th data-quarto-table-cell-role="th">빈도(매경)</th>
+<th data-quarto-table-cell-role="th">단어(서경)</th>
+<th data-quarto-table-cell-role="th">빈도(서경)</th>
+<th data-quarto-table-cell-role="th">단어(파이낸셜)</th>
+<th data-quarto-table-cell-role="th">빈도(파이낸셜)</th>
+<th data-quarto-table-cell-role="th">단어(헤럴드)</th>
+<th data-quarto-table-cell-role="th">빈도(헤럴드)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>정부</td>
+<td>170.874039</td>
+<td>정부</td>
+<td>127.335164</td>
+<td>정부</td>
+<td>207.973736</td>
+<td>정부</td>
+<td>96.774121</td>
+<td>정부</td>
+<td>68.249231</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>기업</td>
+<td>143.353837</td>
+<td>기업</td>
+<td>110.468213</td>
+<td>북한</td>
+<td>153.504708</td>
+<td>대통령</td>
+<td>78.668422</td>
+<td>대통령</td>
+<td>55.984063</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>경제</td>
+<td>109.593958</td>
+<td>대통령</td>
+<td>105.349634</td>
+<td>기업</td>
+<td>147.576313</td>
+<td>기업</td>
+<td>73.745679</td>
+<td>경제</td>
+<td>47.226472</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>규제</td>
+<td>99.747167</td>
+<td>경제</td>
+<td>98.987800</td>
+<td>경제</td>
+<td>141.483724</td>
+<td>경제</td>
+<td>66.228374</td>
+<td>국민</td>
+<td>43.421289</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>한국</td>
+<td>96.602629</td>
+<td>북한</td>
+<td>94.959321</td>
+<td>대통령</td>
+<td>136.803875</td>
+<td>미국</td>
+<td>60.756488</td>
+<td>기업</td>
+<td>43.096729</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>정책</td>
+<td>95.039328</td>
+<td>미국</td>
+<td>93.682823</td>
+<td>정책</td>
+<td>125.951686</td>
+<td>일자리</td>
+<td>58.554333</td>
+<td>정책</td>
+<td>41.426563</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>미국</td>
+<td>90.302124</td>
+<td>중국</td>
+<td>87.481722</td>
+<td>미국</td>
+<td>125.941853</td>
+<td>한국</td>
+<td>57.845017</td>
+<td>검찰</td>
+<td>36.136012</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>대통령</td>
+<td>89.964928</td>
+<td>한국</td>
+<td>86.394644</td>
+<td>일자리</td>
+<td>108.601917</td>
+<td>정책</td>
+<td>53.730281</td>
+<td>상황</td>
+<td>35.747487</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>북한</td>
+<td>86.210303</td>
+<td>정책</td>
+<td>76.064262</td>
+<td>중국</td>
+<td>104.657793</td>
+<td>시장</td>
+<td>51.787001</td>
+<td>미국</td>
+<td>34.320186</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>중국</td>
+<td>83.305281</td>
+<td>국민</td>
+<td>73.182543</td>
+<td>규제</td>
+<td>100.005150</td>
+<td>규제</td>
+<td>45.949896</td>
+<td>국회</td>
+<td>33.419709</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>국민</td>
+<td>79.407091</td>
+<td>규제</td>
+<td>68.673798</td>
+<td>국민</td>
+<td>97.847511</td>
+<td>국회</td>
+<td>43.571681</td>
+<td>북한</td>
+<td>32.206295</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>일자리</td>
+<td>79.164376</td>
+<td>국회</td>
+<td>64.407326</td>
+<td>임금</td>
+<td>88.199132</td>
+<td>중국</td>
+<td>42.673492</td>
+<td>장관</td>
+<td>32.127931</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>시장</td>
+<td>68.216227</td>
+<td>시장</td>
+<td>63.713174</td>
+<td>한국</td>
+<td>84.390802</td>
+<td>일본</td>
+<td>40.091627</td>
+<td>한국</td>
+<td>31.377541</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>노조</td>
+<td>67.212984</td>
+<td>투자</td>
+<td>61.656313</td>
+<td>국회</td>
+<td>83.832130</td>
+<td>성장</td>
+<td>39.962075</td>
+<td>일자리</td>
+<td>30.921592</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>여당</td>
+<td>64.899902</td>
+<td>일자리</td>
+<td>60.358299</td>
+<td>투자</td>
+<td>81.507045</td>
+<td>임금</td>
+<td>39.627805</td>
+<td>성장</td>
+<td>30.897654</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>투자</td>
+<td>64.160446</td>
+<td>임금</td>
+<td>59.657628</td>
+<td>시장</td>
+<td>80.210144</td>
+<td>북한</td>
+<td>39.523417</td>
+<td>임금</td>
+<td>30.480363</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>임금</td>
+<td>62.896762</td>
+<td>일본</td>
+<td>58.333997</td>
+<td>성장</td>
+<td>79.884542</td>
+<td>국민</td>
+<td>38.434493</td>
+<td>대표</td>
+<td>29.536249</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>산업</td>
+<td>60.127337</td>
+<td>성장</td>
+<td>52.338215</td>
+<td>장관</td>
+<td>74.306424</td>
+<td>부동산</td>
+<td>35.483854</td>
+<td>인상</td>
+<td>28.477505</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>일본</td>
+<td>58.510270</td>
+<td>산업</td>
+<td>52.099878</td>
+<td>산업</td>
+<td>73.267545</td>
+<td>후보</td>
+<td>34.080738</td>
+<td>정도</td>
+<td>28.369887</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>국회</td>
+<td>58.063480</td>
+<td>장관</td>
+<td>51.585880</td>
+<td>인상</td>
+<td>73.013147</td>
+<td>반도체</td>
+<td>33.821207</td>
+<td>정치</td>
+<td>27.913461</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="dimension-reduction" class="level2">
+<h2 class="anchored" data-anchor-id="dimension-reduction">Dimension Reduction</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:37:53.766468Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:37:53.752507Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> targeting(x):</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x <span class="op">==</span> <span class="st">'한국경제'</span>:</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="op">==</span> <span class="st">'매일경제'</span>:</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="op">==</span> <span class="st">'서울경제'</span>:</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">2</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="op">==</span> <span class="st">'파이낸셜뉴스'</span>:</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">3</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="op">==</span> <span class="st">'헤럴드경제'</span>:</span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">4</span></span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="op">==</span> <span class="st">'아시아경제'</span>:</span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">5</span></span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:37:55.091787Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:37:55.067853Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'target'</span>] <span class="op">=</span> df[<span class="st">'언론사'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x : targeting(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:38:00.482391Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:38:00.459454Z&quot;}" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>df20 <span class="op">=</span> df[df[<span class="st">'일자'</span>] <span class="op">&gt;=</span> <span class="dv">20200100</span>]</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>df10 <span class="op">=</span> df[df[<span class="st">'일자'</span>] <span class="op">&lt;</span> <span class="dv">20200100</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:55:24.908585Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:55:24.887643Z&quot;}" data-execution_count="57">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>text20 <span class="op">=</span> df20[<span class="st">'키워드'</span>]</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>text20_df <span class="op">=</span> df20[[<span class="st">'언론사'</span>, <span class="st">'제목'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:33:32.377876Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:33:19.269832Z&quot;}" data-execution_count="58">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> CountVectorizer, TfidfTransformer</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> Pipeline([</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'vect'</span>, CountVectorizer()),</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'tfidf'</span>, TfidfTransformer()),</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>])        </span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>vec <span class="op">=</span> pipeline.fit_transform(text20).toarray()</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>pca_df <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>).fit_transform(vec)</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>pca_df <span class="op">=</span> pd.DataFrame(pca_df, columns <span class="op">=</span> [<span class="st">'component 0'</span>, <span class="st">'component 1'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:33:49.906642Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:33:49.202354Z&quot;}" data-execution_count="59">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>pca_df[<span class="st">'target'</span>] <span class="op">=</span> df[<span class="st">'target'</span>]</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="co"># target 별 분리</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>pca_0 <span class="op">=</span> pca_df[pca_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>pca_1 <span class="op">=</span> pca_df[pca_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>pca_2 <span class="op">=</span> pca_df[pca_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>pca_3 <span class="op">=</span> pca_df[pca_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">3</span>]</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>pca_4 <span class="op">=</span> pca_df[pca_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">4</span>]</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>pca_5 <span class="op">=</span> pca_df[pca_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">5</span>]</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a><span class="co"># target 별 시각화</span></span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_0[<span class="st">'component 0'</span>], pca_0[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'blue'</span>, label <span class="op">=</span> <span class="st">'한국경제'</span>)</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_1[<span class="st">'component 0'</span>], pca_1[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'orange'</span>, label <span class="op">=</span> <span class="st">'매일경제'</span>)</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_2[<span class="st">'component 0'</span>], pca_2[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'green'</span>, label <span class="op">=</span> <span class="st">'서울경제'</span>)</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_3[<span class="st">'component 0'</span>], pca_3[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'yellow'</span>, label <span class="op">=</span> <span class="st">'파이낸셜'</span>)</span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_4[<span class="st">'component 0'</span>], pca_4[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'pink'</span>, label <span class="op">=</span> <span class="st">'헤럴드'</span>)</span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_5[<span class="st">'component 0'</span>], pca_5[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'purple'</span>, label <span class="op">=</span> <span class="st">'아시아경제'</span>)</span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'component 0'</span>)</span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'component 1'</span>)</span>
+<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb57-22"><a href="#cb57-22" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-56-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:40:45.913507Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:39:36.297531Z&quot;}" data-execution_count="60">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.manifold <span class="im">import</span> TSNE</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>tsne <span class="op">=</span> TSNE(n_components<span class="op">=</span><span class="dv">2</span>, learning_rate<span class="op">=</span><span class="dv">400</span>).fit_transform(vec)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>tsne_df <span class="op">=</span> pd.DataFrame(tsne, columns <span class="op">=</span> [<span class="st">'component 0'</span>, <span class="st">'component 1'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T00:40:46.666278Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T00:40:46.166471Z&quot;}" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># class target 정보 불러오기 </span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>tsne_df[<span class="st">'target'</span>] <span class="op">=</span> df[<span class="st">'target'</span>]</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="co"># target 별 분리</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>tsne_0 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>tsne_1 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>tsne_2 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>tsne_3 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">3</span>]</span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>tsne_4 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">4</span>]</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>tsne_5 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'target'</span>] <span class="op">==</span> <span class="dv">5</span>]</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a><span class="co"># target 별 시각화</span></span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_0[<span class="st">'component 0'</span>], tsne_0[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'blue'</span>, label <span class="op">=</span> <span class="st">'한국경제'</span>)</span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_1[<span class="st">'component 0'</span>], tsne_1[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'orange'</span>, label <span class="op">=</span> <span class="st">'매일경제'</span>)</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_2[<span class="st">'component 0'</span>], tsne_2[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'green'</span>, label <span class="op">=</span> <span class="st">'서울경제'</span>)</span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_3[<span class="st">'component 0'</span>], tsne_3[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'yellow'</span>, label <span class="op">=</span> <span class="st">'파이낸셜'</span>)</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_4[<span class="st">'component 0'</span>], tsne_4[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'pink'</span>, label <span class="op">=</span> <span class="st">'헤럴드'</span>)</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_5[<span class="st">'component 0'</span>], tsne_5[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'purple'</span>, label <span class="op">=</span> <span class="st">'아시아경제'</span>)</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'component 0'</span>)</span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'component 1'</span>)</span>
+<span id="cb59-22"><a href="#cb59-22" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-58-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>t-SNE 결과, 문서 간의 일종의 군집이 존재하는 것으로 추정</p>
+<p>문서 군집화를 시도해보면 좋으리라 생각</p>
+</section>
+<section id="dbscan" class="level2">
+<h2 class="anchored" data-anchor-id="dbscan">DBSCAN</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:33:58.694210Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:33:56.810234Z&quot;}" data-execution_count="62">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> Normalizer</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>nor <span class="op">=</span> Normalizer()</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>vec_nor <span class="op">=</span> nor.fit_transform(vec)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="63">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MinMaxScaler</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>mms <span class="op">=</span> MinMaxScaler()</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>mms_nor <span class="op">=</span> mms.fit_transform(vec_nor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:35:14.336540Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:34:40.807204Z&quot;}" data-execution_count="64">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> NearestNeighbors</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>neigh <span class="op">=</span> NearestNeighbors(n_neighbors<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>nbrs <span class="op">=</span> neigh.fit(mms_nor)</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>distances, indices <span class="op">=</span> nbrs.kneighbors(mms_nor)</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>distances <span class="op">=</span> np.sort(distances, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>distances <span class="op">=</span> distances[:,<span class="dv">1</span>]</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>plt.plot(distances)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-61-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:39:28.962100Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:39:10.339075Z&quot;}" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>dbs <span class="op">=</span> DBSCAN(eps<span class="op">=</span> <span class="dv">7</span>, min_samples<span class="op">=</span> <span class="dv">4</span>, metric <span class="op">=</span> <span class="st">"cosine"</span>) </span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>cluster <span class="op">=</span> dbs.fit_predict(mms_nor)</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>text20_df[<span class="st">'군집'</span>] <span class="op">=</span> cluster</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'군집개수 :'</span>, cluster.<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>군집개수 : 0</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>text20_df.groupby(<span class="st">'군집'</span>).size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="68">
+<pre><code>군집
+0    8433
+dtype: int64</code></pre>
+</div>
+</div>
+<p>군집이 형성되지 X</p>
+<p>DBSCAN은 해당 요소에 사용할 만한 모델 X</p>
+</section>
+<section id="k-means" class="level2">
+<h2 class="anchored" data-anchor-id="k-means">K-Means</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:39:36.720621Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:39:34.147169Z&quot;}" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> yellowbrick.cluster <span class="im">import</span> KElbowVisualizer</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>vzr <span class="op">=</span> KElbowVisualizer(KMeans(), k<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">20</span>))</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>vzr.fit(pca_df)</span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>vzr.poof()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-64-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="69">
+<pre><code>&lt;AxesSubplot: title={'center': 'Distortion Score Elbow for KMeans Clustering'}, xlabel='k', ylabel='distortion score'&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:39:51.442802Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:39:51.433827Z&quot;}" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> yellowbrick.cluster <span class="im">import</span> SilhouetteVisualizer</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>kmeans<span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">5</span>, max_iter<span class="op">=</span><span class="dv">1000</span>, random_state<span class="op">=</span><span class="dv">0</span>) <span class="co">#최적 Topic 개수 5개를 기점으로 진행</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>visualizer <span class="op">=</span> SilhouetteVisualizer(kmeans, colors<span class="op">=</span><span class="st">'yellowbrick'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:42:35.080573Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:39:53.403765Z&quot;}" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>visualizer.fit(vec_nor)</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>visualizer.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>MemoryError: Unable to allocate 3.71 GiB for an array with shape (8433, 59099) and data type float64</code></pre>
+</div>
+</div>
+<p>생각보다 실루엣 계수가 많이 낮음</p>
+<p>K-means의 한계인 것인지, 아니면 정말 군집화가 잘 안된 것인지 추후 확인 필요</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:45:29.663851Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:43:21.786956Z&quot;}" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>kmeans.fit(vec_nor)</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> kmeans.labels_</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>text_df[<span class="st">'군집'</span>] <span class="op">=</span> labels</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:47:19.948186Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:47:19.923254Z&quot;}" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>text_df.groupby(<span class="st">'군집'</span>).size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<pre><code>군집
+0     421
+1     265
+2     430
+3    2627
+4    1066
+dtype: int64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># text_df[text_df['군집'] == 0].tail(20)</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="co"># text_df[text_df['군집'] == 1].tail(20)</span></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a><span class="co"># text_df[text_df['군집'] == 2].tail(20)</span></span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a><span class="co"># text_df[text_df['군집'] == 3].tail(20)</span></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a><span class="co"># text_df[text_df['군집'] == 4].tail(20)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>0번 토픽 = 부동산 관련 칼럼 <br> 1번 토픽 = 코로나 관련 칼럼 <br> 2번 토픽 = 북한 관련 칼럼 <br> 3번 토픽 = 경제 정책 관련 칼럼 <br> 4번 토픽 = 정치 이슈 관련 칼럼</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:59:47.993294Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:59:47.621177Z&quot;}" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>pca_df[<span class="st">'cluster'</span>] <span class="op">=</span> labels</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>pca_clu_0 <span class="op">=</span> pca_df[pca_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>pca_clu_1 <span class="op">=</span> pca_df[pca_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>pca_clu_2 <span class="op">=</span> pca_df[pca_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>pca_clu_3 <span class="op">=</span> pca_df[pca_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">3</span>]</span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>pca_clu_4 <span class="op">=</span> pca_df[pca_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">4</span>]</span>
+<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_clu_0[<span class="st">'component 0'</span>], pca_clu_0[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'blue'</span>, label <span class="op">=</span> <span class="st">'부동산'</span>)</span>
+<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_clu_1[<span class="st">'component 0'</span>], pca_clu_1[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'orange'</span>, label <span class="op">=</span> <span class="st">'코로나'</span>)</span>
+<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_clu_2[<span class="st">'component 0'</span>], pca_clu_2[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'green'</span>, label <span class="op">=</span> <span class="st">'북한'</span>)</span>
+<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_clu_3[<span class="st">'component 0'</span>], pca_clu_3[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'purple'</span>, label <span class="op">=</span> <span class="st">'경제 정책'</span>)</span>
+<span id="cb76-13"><a href="#cb76-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(pca_clu_4[<span class="st">'component 0'</span>], pca_clu_4[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'정치'</span>)</span>
+<span id="cb76-14"><a href="#cb76-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-15"><a href="#cb76-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'component 0'</span>)</span>
+<span id="cb76-16"><a href="#cb76-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'component 1'</span>)</span>
+<span id="cb76-17"><a href="#cb76-17" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb76-18"><a href="#cb76-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-70-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2022-12-14T01:59:31.594015Z&quot;,&quot;start_time&quot;:&quot;2022-12-14T01:59:31.227750Z&quot;}" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>tsne_df[<span class="st">'cluster'</span>] <span class="op">=</span> labels</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>tsne_clu0 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>tsne_clu1 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>tsne_clu2 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>tsne_clu3 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">3</span>]</span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>tsne_clu4 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">4</span>]</span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a><span class="co"># target 별 시각화</span></span>
+<span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_clu0[<span class="st">'component 0'</span>], tsne_clu0[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'blue'</span>, label <span class="op">=</span> <span class="st">'부동산'</span>)</span>
+<span id="cb77-11"><a href="#cb77-11" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_clu1[<span class="st">'component 0'</span>], tsne_clu1[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'orange'</span>, label <span class="op">=</span> <span class="st">'코로나'</span>)</span>
+<span id="cb77-12"><a href="#cb77-12" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_clu2[<span class="st">'component 0'</span>], tsne_clu2[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'green'</span>, label <span class="op">=</span> <span class="st">'북한'</span>)</span>
+<span id="cb77-13"><a href="#cb77-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_clu3[<span class="st">'component 0'</span>], tsne_clu3[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'purple'</span>, label <span class="op">=</span> <span class="st">'경제 정책'</span>)</span>
+<span id="cb77-14"><a href="#cb77-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(tsne_clu4[<span class="st">'component 0'</span>], tsne_clu4[<span class="st">'component 1'</span>], color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'정치'</span>)</span>
+<span id="cb77-15"><a href="#cb77-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-16"><a href="#cb77-16" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'component 0'</span>)</span>
+<span id="cb77-17"><a href="#cb77-17" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'component 1'</span>)</span>
+<span id="cb77-18"><a href="#cb77-18" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb77-19"><a href="#cb77-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="economic_columns_clustering_files/figure-html/cell-71-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

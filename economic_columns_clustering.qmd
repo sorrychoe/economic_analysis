@@ -1,0 +1,655 @@
+---
+title: 언론사 빈도 확인
+jupyter: python3
+---
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:37:23.093529Z', start_time: '2022-12-14T00:37:17.069708Z'}
+import BigKindsParser as bkp
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from wordcloud import WordCloud
+
+import warnings
+warnings.filterwarnings("ignore")
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:57:23.767675Z', start_time: '2022-12-14T00:57:23.754709Z'}
+plt.rcParams["font.family"] = "Malgun Gothic"
+plt.rcParams['figure.figsize'] = 10,10
+sns.set(font="Malgun Gothic", rc={"axes.unicode_minus":False}, style='white')
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:37:36.147998Z', start_time: '2022-12-14T00:37:23.191768Z'}
+df = pd.read_excel('./econo_columns_20170510-20220509.xlsx', engine = "openpyxl")
+```
+
+
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-12T04:45:00.579542Z', start_time: '2022-12-12T04:45:00.567573Z'}
+df_key = bkp.press_counter(df)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-12T04:45:00.942498Z', start_time: '2022-12-12T04:45:00.707045Z'}
+sns.barplot(data = df_key, x = '기사', y = '언론사')
+
+plt.figure(facecolor = 'white')
+plt.show()
+```
+
+## 이상치 확인
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:44:48.696625Z', start_time: '2022-10-12T14:44:48.681024Z'}
+outlier = df[df['언론사'] == '아시아경제'] ##아시아 경제 기사 추가 크롤링 필요
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:44:49.674876Z', start_time: '2022-10-12T14:44:49.653460Z'}
+#| collapsed: true
+outlier['일자'] #아시아경제 기사는 2021년부터 빅카인즈에 기사를 업로드 --> 2017~2020년 기사는 별도 크롤링 필요
+```
+
+## 키워드 빈도
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:44:54.237870Z', start_time: '2022-10-12T14:44:54.227735Z'}
+df_keywords = df['키워드']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:44:54.438962Z', start_time: '2022-10-12T14:44:54.414475Z'}
+keywords = bkp.keywords_list(df_keywords)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:44:58.649922Z', start_time: '2022-10-12T14:44:54.635774Z'}
+news_key = bkp.keyword_parser(keywords)
+news_key = bkp.duplication_remover(news_key)
+key = bkp.word_counter(news_key)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:44:59.053722Z', start_time: '2022-10-12T14:44:58.660005Z'}
+news_key = bkp.counter_to_DataFrame(key)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:02.427020Z', start_time: '2022-10-12T14:44:59.061223Z'}
+#| collapsed: true
+wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+    width = 500,
+    height = 500,
+    background_color='white').generate_from_frequencies(news_key.set_index('단어').to_dict()["빈도"])
+
+
+plt.figure(figsize = (10, 10))
+plt.imshow(wc)
+plt.axis('off')
+plt.show()
+```
+
+### 언론사별 키워드 분석 --> 한경
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:06.430465Z', start_time: '2022-10-12T14:45:05.496373Z'}
+bkp.press_keywords_wordcloud(df, '한국경제')
+```
+
+### 언론사별 키워드 분석 --> 매경
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:10.207550Z', start_time: '2022-10-12T14:45:09.174800Z'}
+bkp.press_keywords_wordcloud(df, '매일경제')
+```
+
+### 언론사별 키워드 분석 --> 서경
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:14.132423Z', start_time: '2022-10-12T14:45:13.072564Z'}
+bkp.press_keywords_wordcloud(df, '서울경제')
+```
+
+### 언론사별 키워드 분석 --> 파이낸셜
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:17.650350Z', start_time: '2022-10-12T14:45:16.945465Z'}
+bkp.press_keywords_wordcloud(df, '파이낸셜뉴스')
+```
+
+### 언론사별 키워드 분석 --> 헤럴드
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:21.015066Z', start_time: '2022-10-12T14:45:20.474348Z'}
+bkp.press_keywords_wordcloud(df, '헤럴드경제')
+```
+
+## TF-IDF 분석
+
+언론사별 용어 빈도는 비슷 --> tf-idf를 통한 특징 추출 필요
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:37:48.667965Z', start_time: '2022-12-14T00:37:48.296449Z'}
+from sklearn.feature_extraction.text import TfidfVectorizer #module import
+```
+
+### 한경 
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:31.822551Z', start_time: '2022-10-12T14:45:31.801275Z'}
+han_words = df[df['언론사'] == '한국경제']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:32.225334Z', start_time: '2022-10-12T14:45:32.210183Z'}
+han_words = han_words['키워드']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:34.640530Z', start_time: '2022-10-12T14:45:32.411014Z'}
+tfidf = TfidfVectorizer()
+tdm = tfidf.fit_transform(han_words)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:35.323404Z', start_time: '2022-10-12T14:45:35.198025Z'}
+word_count1 = pd.DataFrame({
+    '단어': tfidf.get_feature_names(),
+    '빈도': tdm.sum(axis=0).flat
+}).sort_values('빈도', ascending = False).reset_index(drop = True)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:39.691878Z', start_time: '2022-10-12T14:45:36.761591Z'}
+#| collapsed: true
+wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+    width = 500,
+    height = 500,
+    background_color='white').generate_from_frequencies(word_count1.set_index('단어').to_dict()["빈도"])
+
+
+plt.figure(figsize = (10, 10))
+plt.imshow(wc)
+plt.axis('off')
+plt.show()
+```
+
+### 매경
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:43.148218Z', start_time: '2022-10-12T14:45:43.118480Z'}
+mail_words = df[df['언론사'] == '매일경제']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:43.319297Z', start_time: '2022-10-12T14:45:43.300395Z'}
+mail_words = mail_words['키워드']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:45.509197Z', start_time: '2022-10-12T14:45:43.482828Z'}
+tfidf = TfidfVectorizer()
+tdm = tfidf.fit_transform(mail_words)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:45.649307Z', start_time: '2022-10-12T14:45:45.517193Z'}
+word_count2 = pd.DataFrame({
+    '단어': tfidf.get_feature_names(),
+    '빈도': tdm.sum(axis=0).flat
+}).sort_values('빈도', ascending = False).reset_index(drop = True)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:49.409715Z', start_time: '2022-10-12T14:45:46.513102Z'}
+#| collapsed: true
+wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+    width = 500,
+    height = 500,
+    background_color='white').generate_from_frequencies(word_count2.set_index('단어').to_dict()["빈도"])
+
+
+plt.figure(figsize = (10, 10))
+plt.imshow(wc)
+plt.axis('off')
+plt.show()
+```
+
+### 서경
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:51.699644Z', start_time: '2022-10-12T14:45:51.677364Z'}
+seo_words = df[df['언론사'] == '서울경제']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:51.869930Z', start_time: '2022-10-12T14:45:51.854092Z'}
+seo_words = seo_words['키워드']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:54.182361Z', start_time: '2022-10-12T14:45:52.032275Z'}
+tfidf = TfidfVectorizer()
+tdm = tfidf.fit_transform(seo_words)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:54.290298Z', start_time: '2022-10-12T14:45:54.189503Z'}
+word_count3 = pd.DataFrame({
+    '단어': tfidf.get_feature_names(),
+    '빈도': tdm.sum(axis=0).flat
+}).sort_values('빈도', ascending = False).reset_index(drop = True)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:57.140457Z', start_time: '2022-10-12T14:45:54.296920Z'}
+#| collapsed: true
+wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+    width = 500,
+    height = 500,
+    background_color='white').generate_from_frequencies(word_count3.set_index('단어').to_dict()["빈도"])
+
+
+plt.figure(figsize = (10, 10))
+plt.imshow(wc)
+plt.axis('off')
+plt.show()
+```
+
+### 파이낸셜
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:59.324072Z', start_time: '2022-10-12T14:45:59.303146Z'}
+fin_words = df[df['언론사'] == '파이낸셜뉴스']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:45:59.462273Z', start_time: '2022-10-12T14:45:59.450625Z'}
+fin_words = fin_words['키워드']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:01.187439Z', start_time: '2022-10-12T14:45:59.611065Z'}
+tfidf = TfidfVectorizer()
+tdm = tfidf.fit_transform(fin_words)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:01.297043Z', start_time: '2022-10-12T14:46:01.194761Z'}
+word_count4 = pd.DataFrame({
+    '단어': tfidf.get_feature_names(),
+    '빈도': tdm.sum(axis=0).flat
+}).sort_values('빈도', ascending = False).reset_index(drop = True)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:04.129283Z', start_time: '2022-10-12T14:46:01.302971Z'}
+#| collapsed: true
+wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+    width = 500,
+    height = 500,
+    background_color='white').generate_from_frequencies(word_count4.set_index('단어').to_dict()["빈도"])
+
+
+plt.figure(figsize = (10, 10))
+plt.imshow(wc)
+plt.axis('off')
+plt.show()
+```
+
+### 헤럴드
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:13.051090Z', start_time: '2022-10-12T14:46:13.019126Z'}
+hero_words = df[df['언론사'] == '헤럴드경제']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:13.223784Z', start_time: '2022-10-12T14:46:13.201162Z'}
+hero_words = hero_words['키워드']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:14.733820Z', start_time: '2022-10-12T14:46:13.373156Z'}
+tfidf = TfidfVectorizer()
+tdm = tfidf.fit_transform(hero_words)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:14.841825Z', start_time: '2022-10-12T14:46:14.740907Z'}
+word_count5 = pd.DataFrame({
+    '단어': tfidf.get_feature_names(),
+    '빈도': tdm.sum(axis=0).flat
+}).sort_values('빈도', ascending = False).reset_index(drop = True)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:17.633790Z', start_time: '2022-10-12T14:46:14.847297Z'}
+#| collapsed: true
+wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+    width = 500,
+    height = 500,
+    background_color='white').generate_from_frequencies(word_count5.set_index('단어').to_dict()["빈도"])
+
+
+plt.figure(figsize = (10, 10))
+plt.imshow(wc)
+plt.axis('off')
+plt.show()
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:23.160054Z', start_time: '2022-10-12T14:46:23.141790Z'}
+words_df1 = pd.concat([word_count1, word_count2], join='outer', axis=1)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:23.636369Z', start_time: '2022-10-12T14:46:23.617796Z'}
+words_df1.columns = ['단어(한경)', '빈도(한경)', '단어(매경)', '빈도(매경)']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:24.026147Z', start_time: '2022-10-12T14:46:23.982635Z'}
+words_df2 = pd.concat([word_count3, word_count4, word_count5], join='outer', axis=1)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:24.367511Z', start_time: '2022-10-12T14:46:24.354944Z'}
+words_df2.columns = ['단어(서경)', '빈도(서경)','단어(파이낸셜)', '빈도(파이낸셜)','단어(헤럴드)', '빈도(헤럴드)']
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:24.785629Z', start_time: '2022-10-12T14:46:24.738074Z'}
+words_df = pd.concat([words_df1, words_df2], join = 'outer', axis = 1)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-10-12T14:46:25.172315Z', start_time: '2022-10-12T14:46:25.117889Z'}
+#| collapsed: true
+words_df.head(20)
+```
+
+## Dimension Reduction
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:37:53.766468Z', start_time: '2022-12-14T00:37:53.752507Z'}
+def targeting(x):
+    if x == '한국경제':
+        return 0
+    elif x == '매일경제':
+        return 1
+    elif x == '서울경제':
+        return 2
+    elif x == '파이낸셜뉴스':
+        return 3
+    elif x == '헤럴드경제':
+        return 4
+    elif x == '아시아경제':
+        return 5
+    
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:37:55.091787Z', start_time: '2022-12-14T00:37:55.067853Z'}
+df['target'] = df['언론사'].apply(lambda x : targeting(x))
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:38:00.482391Z', start_time: '2022-12-14T00:38:00.459454Z'}
+df20 = df[df['일자'] >= 20200100]
+df10 = df[df['일자'] < 20200100]
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:55:24.908585Z', start_time: '2022-12-14T00:55:24.887643Z'}
+text20 = df20['키워드']
+text20_df = df20[['언론사', '제목']]
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:33:32.377876Z', start_time: '2022-12-14T01:33:19.269832Z'}
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    ('vect', CountVectorizer()),
+    ('tfidf', TfidfTransformer()),
+])        
+vec = pipeline.fit_transform(text20).toarray()
+
+pca_df = PCA(n_components=2).fit_transform(vec)
+
+pca_df = pd.DataFrame(pca_df, columns = ['component 0', 'component 1'])
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:33:49.906642Z', start_time: '2022-12-14T01:33:49.202354Z'}
+pca_df['target'] = df['target']
+
+# target 별 분리
+pca_0 = pca_df[pca_df['target'] == 0]
+pca_1 = pca_df[pca_df['target'] == 1]
+pca_2 = pca_df[pca_df['target'] == 2]
+pca_3 = pca_df[pca_df['target'] == 3]
+pca_4 = pca_df[pca_df['target'] == 4]
+pca_5 = pca_df[pca_df['target'] == 5]
+
+# target 별 시각화
+plt.scatter(pca_0['component 0'], pca_0['component 1'], color = 'blue', label = '한국경제')
+plt.scatter(pca_1['component 0'], pca_1['component 1'], color = 'orange', label = '매일경제')
+plt.scatter(pca_2['component 0'], pca_2['component 1'], color = 'green', label = '서울경제')
+plt.scatter(pca_3['component 0'], pca_3['component 1'], color = 'yellow', label = '파이낸셜')
+plt.scatter(pca_4['component 0'], pca_4['component 1'], color = 'pink', label = '헤럴드')
+plt.scatter(pca_5['component 0'], pca_5['component 1'], color = 'purple', label = '아시아경제')
+
+plt.xlabel('component 0')
+plt.ylabel('component 1')
+plt.legend()
+plt.show()
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:40:45.913507Z', start_time: '2022-12-14T00:39:36.297531Z'}
+from sklearn.manifold import TSNE
+
+tsne = TSNE(n_components=2, learning_rate=400).fit_transform(vec)
+
+tsne_df = pd.DataFrame(tsne, columns = ['component 0', 'component 1'])
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T00:40:46.666278Z', start_time: '2022-12-14T00:40:46.166471Z'}
+# class target 정보 불러오기 
+tsne_df['target'] = df['target']
+
+# target 별 분리
+tsne_0 = tsne_df[tsne_df['target'] == 0]
+tsne_1 = tsne_df[tsne_df['target'] == 1]
+tsne_2 = tsne_df[tsne_df['target'] == 2]
+tsne_3 = tsne_df[tsne_df['target'] == 3]
+tsne_4 = tsne_df[tsne_df['target'] == 4]
+tsne_5 = tsne_df[tsne_df['target'] == 5]
+
+# target 별 시각화
+plt.scatter(tsne_0['component 0'], tsne_0['component 1'], color = 'blue', label = '한국경제')
+plt.scatter(tsne_1['component 0'], tsne_1['component 1'], color = 'orange', label = '매일경제')
+plt.scatter(tsne_2['component 0'], tsne_2['component 1'], color = 'green', label = '서울경제')
+plt.scatter(tsne_3['component 0'], tsne_3['component 1'], color = 'yellow', label = '파이낸셜')
+plt.scatter(tsne_4['component 0'], tsne_4['component 1'], color = 'pink', label = '헤럴드')
+plt.scatter(tsne_5['component 0'], tsne_5['component 1'], color = 'purple', label = '아시아경제')
+
+plt.xlabel('component 0')
+plt.ylabel('component 1')
+plt.legend()
+plt.show()
+```
+
+t-SNE 결과, 문서 간의 일종의 군집이 존재하는 것으로 추정
+
+문서 군집화를 시도해보면 좋으리라 생각
+
+## DBSCAN
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:33:58.694210Z', start_time: '2022-12-14T01:33:56.810234Z'}
+from sklearn.preprocessing import Normalizer
+
+nor = Normalizer()
+vec_nor = nor.fit_transform(vec)
+```
+
+```{python}
+from sklearn.preprocessing import MinMaxScaler
+
+mms = MinMaxScaler()
+mms_nor = mms.fit_transform(vec_nor)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:35:14.336540Z', start_time: '2022-12-14T01:34:40.807204Z'}
+from sklearn.neighbors import NearestNeighbors
+
+neigh = NearestNeighbors(n_neighbors=5)
+nbrs = neigh.fit(mms_nor)
+distances, indices = nbrs.kneighbors(mms_nor)
+
+distances = np.sort(distances, axis=0)
+distances = distances[:,1]
+
+plt.plot(distances)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:39:28.962100Z', start_time: '2022-12-14T01:39:10.339075Z'}
+from sklearn.cluster import DBSCAN
+
+dbs = DBSCAN(eps= 7, min_samples= 4, metric = "cosine") 
+cluster = dbs.fit_predict(mms_nor)
+text20_df['군집'] = cluster
+
+print('군집개수 :', cluster.max())
+```
+
+```{python}
+text20_df.groupby('군집').size()
+```
+
+군집이 형성되지 X
+
+DBSCAN은 해당 요소에 사용할 만한 모델 X
+
+## K-Means
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:39:36.720621Z', start_time: '2022-12-14T01:39:34.147169Z'}
+from sklearn.cluster import KMeans
+from yellowbrick.cluster import KElbowVisualizer
+
+vzr = KElbowVisualizer(KMeans(), k=(2, 20))
+vzr.fit(pca_df)
+vzr.poof()
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:39:51.442802Z', start_time: '2022-12-14T01:39:51.433827Z'}
+from yellowbrick.cluster import SilhouetteVisualizer
+
+kmeans= KMeans(n_clusters=5, max_iter=1000, random_state=0) #최적 Topic 개수 5개를 기점으로 진행
+visualizer = SilhouetteVisualizer(kmeans, colors='yellowbrick')
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:42:35.080573Z', start_time: '2022-12-14T01:39:53.403765Z'}
+visualizer.fit(vec_nor)
+visualizer.show()
+```
+
+생각보다 실루엣 계수가 많이 낮음
+
+K-means의 한계인 것인지, 아니면 정말 군집화가 잘 안된 것인지 추후 확인 필요
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:45:29.663851Z', start_time: '2022-12-14T01:43:21.786956Z'}
+kmeans.fit(vec_nor)
+
+labels = kmeans.labels_
+
+text_df['군집'] = labels
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:47:19.948186Z', start_time: '2022-12-14T01:47:19.923254Z'}
+text_df.groupby('군집').size()
+```
+
+```{python}
+# text_df[text_df['군집'] == 0].tail(20)
+# text_df[text_df['군집'] == 1].tail(20)
+# text_df[text_df['군집'] == 2].tail(20)
+# text_df[text_df['군집'] == 3].tail(20)
+# text_df[text_df['군집'] == 4].tail(20)
+```
+
+0번 토픽 = 부동산 관련 칼럼
+</br>
+1번 토픽 = 코로나 관련 칼럼
+</br>
+2번 토픽 = 북한 관련 칼럼
+</br>
+3번 토픽 = 경제 정책 관련 칼럼
+</br>
+4번 토픽 = 정치 이슈 관련 칼럼
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:59:47.993294Z', start_time: '2022-12-14T01:59:47.621177Z'}
+pca_df['cluster'] = labels
+
+pca_clu_0 = pca_df[pca_df['cluster'] == 0]
+pca_clu_1 = pca_df[pca_df['cluster'] == 1]
+pca_clu_2 = pca_df[pca_df['cluster'] == 2]
+pca_clu_3 = pca_df[pca_df['cluster'] == 3]
+pca_clu_4 = pca_df[pca_df['cluster'] == 4]
+
+plt.scatter(pca_clu_0['component 0'], pca_clu_0['component 1'], color = 'blue', label = '부동산')
+plt.scatter(pca_clu_1['component 0'], pca_clu_1['component 1'], color = 'orange', label = '코로나')
+plt.scatter(pca_clu_2['component 0'], pca_clu_2['component 1'], color = 'green', label = '북한')
+plt.scatter(pca_clu_3['component 0'], pca_clu_3['component 1'], color = 'purple', label = '경제 정책')
+plt.scatter(pca_clu_4['component 0'], pca_clu_4['component 1'], color = 'red', label = '정치')
+
+plt.xlabel('component 0')
+plt.ylabel('component 1')
+plt.legend()
+plt.show()
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2022-12-14T01:59:31.594015Z', start_time: '2022-12-14T01:59:31.227750Z'}
+tsne_df['cluster'] = labels
+
+tsne_clu0 = tsne_df[tsne_df['cluster'] == 0]
+tsne_clu1 = tsne_df[tsne_df['cluster'] == 1]
+tsne_clu2 = tsne_df[tsne_df['cluster'] == 2]
+tsne_clu3 = tsne_df[tsne_df['cluster'] == 3]
+tsne_clu4 = tsne_df[tsne_df['cluster'] == 4]
+
+# target 별 시각화
+plt.scatter(tsne_clu0['component 0'], tsne_clu0['component 1'], color = 'blue', label = '부동산')
+plt.scatter(tsne_clu1['component 0'], tsne_clu1['component 1'], color = 'orange', label = '코로나')
+plt.scatter(tsne_clu2['component 0'], tsne_clu2['component 1'], color = 'green', label = '북한')
+plt.scatter(tsne_clu3['component 0'], tsne_clu3['component 1'], color = 'purple', label = '경제 정책')
+plt.scatter(tsne_clu4['component 0'], tsne_clu4['component 1'], color = 'red', label = '정치')
+
+plt.xlabel('component 0')
+plt.ylabel('component 1')
+plt.legend()
+plt.show()
+```
+

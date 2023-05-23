@@ -1,0 +1,28 @@
+project:
+  type: book
+
+execute:
+  freeze: auto
+
+book:
+  title: "Economic Columns Analysis at period of president moon"
+  author: "Jaeseong Choe"
+  date: today
+  downloads: [epub]
+  url: https://sorrychoe.com/economic
+  repo-url: https://github.com/juba/bookup-html/tree/main/examples/book
+  repo-actions: edit
+  search: true
+  reader-mode: true
+  sidebar:
+    style: "docked"
+  chapters:
+    - index.qmd
+    - part: "Reports"
+      chapters:
+        - economic_columns_clustering.qmd
+        - economic_topic_modeling.qmd
+
+
+format:
+  bookup-html
