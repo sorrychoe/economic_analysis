@@ -1,37 +1,54 @@
 ---
-jupyter: python3
+title: "문재인 정부 기간 경제 신문의 칼럼 담론 분석"
+subtitle: "2. 토픽 모델링을 중심으로"
+author: "sorrychoe"
+format: 
+  html: 
+    smooth-scroll: true
+editor: visual
+execute: 
+  echo: true
+  eval: true
 ---
 
-```{python}
+```{python setup}
 import BigKindsParser as bkp
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import gensim
 
 import warnings
 warnings.filterwarnings("ignore")
-```
 
-```{python}
 plt.rcParams["font.family"] = "Malgun Gothic"
 plt.rcParams["figure.figsize"] = 10,10
 plt.rcParams["axes.unicode_minus"] = False
-```
 
-```{python}
-df = pd.read_excel('./econo_columns_20170510-20220509.xlsx', engine = "openpyxl")
+df = pd.read_excel('./data/econo_columns_20170510-20220509.xlsx', engine = "openpyxl")
 ```
+## 개요
+본 내용은 1편에 이어 단어 군집 분석 방법인 토픽 모델링으로 분석을 진행한 보고서이다.
+
+분석 언어는 Python을 사용했으며, 가장 보편적인 토픽모델링 방법인 LDA(Latent Dirichlet Allocation)를 사용했다.
+
+알고리즘은 gensim 라이브러리의 LDA 모델을 사용했으며, 중간에 하이퍼파라미터 튜닝의 작업을 거쳤다.
+
+## 최적 토픽 갯수 추론
+
+먼저 해당 기사의 최적 토픽 갯수를 추론하기 위해 전처리의 과정을 거쳤다.
 
 ```{python}
 news_words = bkp.keyword_parser(df['키워드'])
-```
-
-```{python}
-import gensim
 news_dict = gensim.corpora.Dictionary(news_words)
 corpus = [news_dict.doc2bow(text) for text in news_words]
 ```
+
+가장 먼저 Perplexity를 통해 최적 토픽 갯수 추론을 시도하였다.
+Perplexity란, 선정된 토픽 개수마다 학습시켜 가장 낮은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
+
+이는 **확률 모델이 결과를 얼마나 정확하게 예측하는지 판단**하는 척도로도 활용된다.
 
 ```{python}
 perplexity = []
@@ -39,6 +56,8 @@ for i in range(2,20):
     ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics = i, id2word=news_dict, passes=15)
     perplexity.append(ldamodel.log_perplexity(corpus))
 ```
+
+그러나 결과적으로 Perplexity는 음수를 나타내고 있어, 해당 문서의 최적 토픽 갯수 추론으로 적합한 방법이 아닌 것으로 밝혀졌다.
 
 ```{python}
 x = range(2,20)
@@ -49,6 +68,11 @@ plt.xticks(range(20), range(20))
 plt.show()
 ```
 
+그 다음으로 Coherence Score를 통해 최적 토픽 갯수 추론을 시도하였다.
+Coherence는 반대로 선정된 토픽 개수마다 학습시켜 가장 높은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
+
+이는 **토픽이 얼마나 의미론적으로 일관성 있는지 판단**하는 척도로 활용된다.
+
 ```{python}
 coherence = []
 for i in range(2,20):
@@ -57,6 +81,8 @@ for i in range(2,20):
     coherence_lda = coherence_mo_lda.get_coherence()
     coherence.append(coherence_lda)
 ```
+
+분석 결과, 18개에서 가장 높은 Coherence score가 나타났다.
 
 ```{python}
 x = range(2,20)
@@ -67,6 +93,10 @@ plt.xticks(range(20), range(20))
 plt.show()
 ```
 
+Coherence score를 토대로, 모델 학습을 진행하였다. 정확도를 높이기 위해 pass는 15, 반복 횟수는 100회로 높게 잡았다.
+
+토픽 별 상위 5개 단어는 하단과 같다.
+
 ```{python}
 NUM_TOPICS = 18
 ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics = NUM_TOPICS, id2word=news_dict, passes=15, iterations=100)
@@ -74,6 +104,8 @@ topics = ldamodel.print_topics(num_words=5)
 for topic in topics:
     print(topic)
 ```
+
+해당 결과를 LDAvis를 통하여 시각화 작업을 진행하였다. 
 
 ```{python}
 import pyLDAvis.gensim_models
@@ -83,38 +115,7 @@ vis = pyLDAvis.gensim_models.prepare(ldamodel, corpus, news_dict)
 pyLDAvis.display(vis)
 ```
 
-```{python}
+```{python. eval=FALSE, ech=FALSE}
 pyLDAvis.save_html(vis, 'economic_LDA.html') #LDAvis save
-```
-
-```{python}
-def make_topictable(ldamodel, corpus):
-    topic_table = pd.DataFrame()
-
-    for i, topic_list in enumerate(ldamodel[corpus]):
-        doc = topic_list[0] if ldamodel.per_word_topics else topic_list            
-        doc = sorted(doc, key=lambda x: (x[1]), reverse=True)
-
-        for j, (topic_num, prop_topic) in enumerate(doc):
-            if j == 0: 
-                topic_table = topic_table.append(pd.Series([int(topic_num), round(prop_topic,4), topic_list]), ignore_index=True)
-            else:
-                break
-    return(topic_table)
-```
-
-```{python}
-topictable = make_topictable(ldamodel, corpus)
-topictable = topictable.reset_index() 
-topictable.columns = ['뉴스 번호', '주요 토픽', '주요 토픽 비중', '토픽 별 비중']
-topictable.head(20)
-```
-
-```{python}
-news_topic_df = pd.concat([df[['제목', '언론사']],topictable['주요 토픽']], axis = 1)
-```
-
-```{python}
-news_topic_df.to_excel("./news_topic.xlsx")
 ```
 

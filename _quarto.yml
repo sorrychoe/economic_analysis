@@ -23,6 +23,5 @@ book:
         - economic_columns_clustering.qmd
         - economic_topic_modeling.qmd
 
-
 format:
   bookup-html
