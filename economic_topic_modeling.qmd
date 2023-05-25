@@ -28,7 +28,9 @@ plt.rcParams["axes.unicode_minus"] = False
 
 df = pd.read_excel('./data/econo_columns_20170510-20220509.xlsx', engine = "openpyxl")
 ```
+
 ## 개요
+
 본 내용은 1편에 이어 단어 군집 분석 방법인 토픽 모델링으로 분석을 진행한 보고서이다.
 
 분석 언어는 Python을 사용했으며, 가장 보편적인 토픽모델링 방법인 LDA(Latent Dirichlet Allocation)를 사용했다.
@@ -40,13 +42,13 @@ df = pd.read_excel('./data/econo_columns_20170510-20220509.xlsx', engine = "open
 먼저 해당 기사의 최적 토픽 갯수를 추론하기 위해 전처리의 과정을 거쳤다.
 
 ```{python}
-news_words = bkp.keyword_parser(df['키워드'])
+keywords = bkp.keywords_list(df)
+news_words = bkp.keyword_parser(keywords)
 news_dict = gensim.corpora.Dictionary(news_words)
 corpus = [news_dict.doc2bow(text) for text in news_words]
 ```
 
-가장 먼저 Perplexity를 통해 최적 토픽 갯수 추론을 시도하였다.
-Perplexity란, 선정된 토픽 개수마다 학습시켜 가장 낮은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
+가장 먼저 Perplexity를 통해 최적 토픽 갯수 추론을 시도하였다. Perplexity란, 선정된 토픽 개수마다 학습시켜 가장 낮은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
 
 이는 **확률 모델이 결과를 얼마나 정확하게 예측하는지 판단**하는 척도로도 활용된다.
 
@@ -68,8 +70,7 @@ plt.xticks(range(20), range(20))
 plt.show()
 ```
 
-그 다음으로 Coherence Score를 통해 최적 토픽 갯수 추론을 시도하였다.
-Coherence는 반대로 선정된 토픽 개수마다 학습시켜 가장 높은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
+그 다음으로 Coherence Score를 통해 최적 토픽 갯수 추론을 시도하였다. Coherence는 반대로 선정된 토픽 개수마다 학습시켜 가장 높은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
 
 이는 **토픽이 얼마나 의미론적으로 일관성 있는지 판단**하는 척도로 활용된다.
 
@@ -93,6 +94,8 @@ plt.xticks(range(20), range(20))
 plt.show()
 ```
 
+## 토픽 모델링
+
 Coherence score를 토대로, 모델 학습을 진행하였다. 정확도를 높이기 위해 pass는 15, 반복 횟수는 100회로 높게 잡았다.
 
 토픽 별 상위 5개 단어는 하단과 같다.
@@ -105,7 +108,7 @@ for topic in topics:
     print(topic)
 ```
 
-해당 결과를 LDAvis를 통하여 시각화 작업을 진행하였다. 
+해당 결과를 LDAvis를 통하여 시각화 작업을 진행하였다.
 
 ```{python}
 import pyLDAvis.gensim_models
@@ -115,7 +118,4 @@ vis = pyLDAvis.gensim_models.prepare(ldamodel, corpus, news_dict)
 pyLDAvis.display(vis)
 ```
 
-```{python. eval=FALSE, ech=FALSE}
-pyLDAvis.save_html(vis, 'economic_LDA.html') #LDAvis save
-```
-
+`{python. eval=FALSE, echo=FALSE} pyLDAvis.save_html(vis, 'economic_LDA.html') #LDAvis save`

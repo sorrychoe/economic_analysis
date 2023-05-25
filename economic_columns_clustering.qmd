@@ -50,17 +50,10 @@ plt.show()
 ```
 
 <!-- ## 이상치 확인
-
-```{python}
-#| ExecuteTime: {end_time: '2022-10-12T14:44:48.696625Z', start_time: '2022-10-12T14:44:48.681024Z'}
 outlier = df[df['언론사'] == '아시아경제'] ##아시아 경제 기사 추가 크롤링 필요
-```
-
-```{python}
-#| ExecuteTime: {end_time: '2022-10-12T14:44:49.674876Z', start_time: '2022-10-12T14:44:49.653460Z'}
-#| collapsed: true
 outlier['일자'] #아시아경제 기사는 2021년부터 빅카인즈에 기사를 업로드 2017~2020년 기사는 별도 크롤링 필요
-``` -->
+-->
+
 
 ## 키워드 빈도
 
@@ -74,7 +67,7 @@ news_key = bkp.duplication_remover(news_key)
 key = bkp.word_counter(news_key)
 news_key = bkp.counter_to_DataFrame(key)
 
-wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+wc = WordCloud(font_path='malgun',
     width = 500,
     height = 500,
     background_color='white').generate_from_frequencies(news_key.set_index('단어').to_dict()["빈도"])
@@ -139,11 +132,11 @@ tfidf = TfidfVectorizer()
 tdm = tfidf.fit_transform(han_words)
 
 word_count1 = pd.DataFrame({
-    '단어': tfidf.get_feature_names(),
+    '단어': tfidf.get_feature_names_out(),
     '빈도': tdm.sum(axis=0).flat
 }).sort_values('빈도', ascending = False).reset_index(drop = True)
 
-wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+wc = WordCloud(font_path = 'malgun',
     width = 500,
     height = 500,
     background_color='white').generate_from_frequencies(word_count1.set_index('단어').to_dict()["빈도"])
@@ -165,11 +158,11 @@ tfidf = TfidfVectorizer()
 tdm = tfidf.fit_transform(mail_words)
 
 word_count2 = pd.DataFrame({
-    '단어': tfidf.get_feature_names(),
+    '단어': tfidf.get_feature_names_out(),
     '빈도': tdm.sum(axis=0).flat
 }).sort_values('빈도', ascending = False).reset_index(drop = True)
 
-wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+wc = WordCloud(font_path = 'malgun',
     width = 500,
     height = 500,
     background_color='white').generate_from_frequencies(word_count2.set_index('단어').to_dict()["빈도"])
@@ -190,11 +183,11 @@ tfidf = TfidfVectorizer()
 tdm = tfidf.fit_transform(seo_words)
 
 word_count3 = pd.DataFrame({
-    '단어': tfidf.get_feature_names(),
+    '단어': tfidf.get_feature_names_out(),
     '빈도': tdm.sum(axis=0).flat
 }).sort_values('빈도', ascending = False).reset_index(drop = True)
 
-wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+wc = WordCloud(font_path = 'malgun',
     width = 500,
     height = 500,
     background_color='white').generate_from_frequencies(word_count3.set_index('단어').to_dict()["빈도"])
@@ -215,11 +208,11 @@ tfidf = TfidfVectorizer()
 tdm = tfidf.fit_transform(fin_words)
 
 word_count4 = pd.DataFrame({
-    '단어': tfidf.get_feature_names(),
+    '단어': tfidf.get_feature_names_out(),
     '빈도': tdm.sum(axis=0).flat
 }).sort_values('빈도', ascending = False).reset_index(drop = True)
 
-wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+wc = WordCloud(font_path = 'malgun',
     width = 500,
     height = 500,
     background_color='white').generate_from_frequencies(word_count4.set_index('단어').to_dict()["빈도"])
@@ -240,11 +233,11 @@ tfidf = TfidfVectorizer()
 tdm = tfidf.fit_transform(hero_words)
 
 word_count5 = pd.DataFrame({
-    '단어': tfidf.get_feature_names(),
+    '단어': tfidf.get_feature_names_out(),
     '빈도': tdm.sum(axis=0).flat
 }).sort_values('빈도', ascending = False).reset_index(drop = True)
 
-wc = WordCloud(font_path = './NanumBarunGothic.ttf',
+wc = WordCloud(font_path = 'malgun',
     width = 500,
     height = 500,
     background_color='white').generate_from_frequencies(word_count5.set_index('단어').to_dict()["빈도"])
@@ -434,18 +427,22 @@ kmeans.fit(vec_nor)
 
 labels = kmeans.labels_
 
-text_df['군집'] = labels
+text20_df['군집'] = labels
 
-text_df.groupby('군집').size()
+text20_df.groupby('군집').size()
 ```
 
 또한 이후 개별적으로 분석해낸 토픽의 양상은 다음과 같다.
 
-0번 토픽 = 부동산 관련 칼럼
-1번 토픽 = 코로나 관련 칼럼
-2번 토픽 = 북한 관련 칼럼
-3번 토픽 = 경제 정책 관련 칼럼
-4번 토픽 = 정치 이슈 관련 칼럼
+0번 토픽 = 검찰 관련 칼럼
+
+1번 토픽 = 총선 관련 칼럼
+
+2번 토픽 = 경제 정책 관련 칼럼
+
+3번 토픽 = 부동산 관련 칼럼
+
+4번 토픽 = 북한 관련 칼럼
 
 해당 결과를 토대로 PCA와 T-SNE를 진행한 결과는 다음과 같다.
 
