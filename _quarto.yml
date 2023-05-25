@@ -9,7 +9,7 @@ book:
   author: "Jaeseong Choe"
   date: today
   downloads: [epub]
-  url: https://sorrychoe.com/economic
+  url: https://sorrychoe.com/economic_analysis
   repo-url: https://github.com/juba/bookup-html/tree/main/examples/book
   repo-actions: edit
   search: true

@@ -68,8 +68,7 @@ outlier['일자'] #아시아경제 기사는 2021년부터 빅카인즈에 기�
 시각화는 워드클라우드로 진행하였으며, 분석 알고리즘은 BigKindsParser를 통해 진행했다.
 
 ```{python}
-df_keywords = df['키워드']
-keywords = bkp.keywords_list(df_keywords)
+keywords = bkp.keywords_list(df)
 news_key = bkp.keyword_parser(keywords)
 news_key = bkp.duplication_remover(news_key)
 key = bkp.word_counter(news_key)
@@ -93,31 +92,31 @@ plt.show()
 ### 언론사별 키워드 분석 --> 한경
 
 ```{python}
-bkp.press_keywords_wordcloud(df, '한국경제')
+bkp.keywords_wordcloud(df, '한국경제')
 ```
 
 ### 언론사별 키워드 분석 --> 매경
 
 ```{python}
-bkp.press_keywords_wordcloud(df, '매일경제')
+bkp.keywords_wordcloud(df, '매일경제')
 ```
 
 ### 언론사별 키워드 분석 --> 서경
 
 ```{python}
-bkp.press_keywords_wordcloud(df, '서울경제')
+bkp.keywords_wordcloud(df, '서울경제')
 ```
 
 ### 언론사별 키워드 분석 --> 파이낸셜
 
 ```{python}
-bkp.press_keywords_wordcloud(df, '파이낸셜뉴스')
+bkp.keywords_wordcloud(df, '파이낸셜뉴스')
 ```
 
 ### 언론사별 키워드 분석 --> 헤럴드
 
 ```{python}
-bkp.press_keywords_wordcloud(df, '헤럴드경제')
+bkp.keywords_wordcloud(df, '헤럴드경제')
 ```
 
 ## TF-IDF 분석
