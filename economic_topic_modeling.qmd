@@ -1,6 +1,5 @@
 ---
-title: "문재인 정부 기간 경제 신문의 칼럼 담론 분석"
-subtitle: "2. 토픽 모델링을 중심으로"
+title: "Topic Modeling을 중심으로"
 author: "sorrychoe"
 format: 
   html: 
@@ -48,51 +47,55 @@ news_dict = gensim.corpora.Dictionary(news_words)
 corpus = [news_dict.doc2bow(text) for text in news_words]
 ```
 
+### Perplexity
+
 가장 먼저 Perplexity를 통해 최적 토픽 갯수 추론을 시도하였다. Perplexity란, 선정된 토픽 개수마다 학습시켜 가장 낮은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
 
 이는 **확률 모델이 결과를 얼마나 정확하게 예측하는지 판단**하는 척도로도 활용된다.
 
-```{python}
+<!-- 
 perplexity = []
 for i in range(2,20):
     ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics = i, id2word=news_dict, passes=15)
     perplexity.append(ldamodel.log_perplexity(corpus))
-```
-
-그러나 결과적으로 Perplexity는 음수를 나타내고 있어, 해당 문서의 최적 토픽 갯수 추론으로 적합한 방법이 아닌 것으로 밝혀졌다.
-
-```{python}
+    
 x = range(2,20)
 plt.plot(x,perplexity)
 plt.xlabel("토픽 개수")
 plt.ylabel("perplexity")
 plt.xticks(range(20), range(20))
-plt.show()
-```
+plt.show() 
+-->
+
+![perplexity](economic_topic_modeling_files\figure-html\cell-8-output-1.png)
+
+그러나 결과적으로 Perplexity는 음수를 나타내고 있어, 해당 문서의 최적 토픽 갯수 추론으로 적합한 방법이 아닌 것으로 밝혀졌다.
+
+
+### Coherence Score
 
 그 다음으로 Coherence Score를 통해 최적 토픽 갯수 추론을 시도하였다. Coherence는 반대로 선정된 토픽 개수마다 학습시켜 가장 높은 값을 보이는 구간을 찾아 최적화된 토픽의 개수 추론하는 방법론이다.
 
 이는 **토픽이 얼마나 의미론적으로 일관성 있는지 판단**하는 척도로 활용된다.
 
-```{python}
-coherence = []
+<!-- coherence = []
 for i in range(2,20):
     ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics = i, id2word=news_dict, passes=15)
     coherence_mo_lda = gensim.models.CoherenceModel(model = ldamodel, texts = news_words, dictionary = news_dict) 
     coherence_lda = coherence_mo_lda.get_coherence()
     coherence.append(coherence_lda)
-```
 
-분석 결과, 18개에서 가장 높은 Coherence score가 나타났다.
-
-```{python}
 x = range(2,20)
 plt.plot(x,coherence)
 plt.xlabel("토픽 개수")
 plt.ylabel("coherence")
 plt.xticks(range(20), range(20))
-plt.show()
-```
+plt.show() -->
+
+![Coherence](economic_topic_modeling_files\figure-html\cell-10-output-1.png)
+
+분석 결과, 18개에서 가장 높은 Coherence score가 나타났다.
+
 
 ## 토픽 모델링
 
@@ -117,5 +120,3 @@ pyLDAvis.enable_notebook()
 vis = pyLDAvis.gensim_models.prepare(ldamodel, corpus, news_dict)
 pyLDAvis.display(vis)
 ```
-
-`{python. eval=FALSE, echo=FALSE} pyLDAvis.save_html(vis, 'economic_LDA.html') #LDAvis save`

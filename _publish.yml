@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: 7afc5c14-ab63-47e2-93ad-09aaf3a7972f
+      url: 'https://sorrychoe.quarto.pub/economic-columns-analysis'

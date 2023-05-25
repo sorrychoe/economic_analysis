@@ -1,6 +1,5 @@
 ---
-title: "문재인 정부 기간 경제 신문의 칼럼 담론 분석"
-subtitle: "1. Clustering analysis을 중심으로"
+title: "Clustering analysis을 중심으로"
 author: "sorrychoe"
 format: 
   html: 
@@ -408,7 +407,7 @@ vec_nor = nor.fit_transform(vec)
 ```{python}
 from yellowbrick.cluster import SilhouetteVisualizer
 
-kmeans= KMeans(n_clusters=5, max_iter=1000, random_state=0) #최적 Topic 개수 5개를 기점으로 진행
+kmeans= KMeans(n_clusters=5, max_iter=1000, random_state=0)
 visualizer = SilhouetteVisualizer(kmeans, colors='yellowbrick')
 ```
 
