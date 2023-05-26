@@ -8,9 +8,8 @@ book:
   title: "Economic Columns Analysis"
   author: "Jaeseong Choe"
   date: 2023/03/07
-  downloads: [epub]
-  url: https://sorrychoe.com/economic_analysis
-  repo-url: https://github.com/juba/bookup-html/tree/main/examples/book
+  downloads: [pdf]
+  repo-url: https://github.com/sorrychoe/economic_analysis
   repo-actions: edit
   search: true
   reader-mode: true

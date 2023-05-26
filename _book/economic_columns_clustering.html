@@ -131,8 +131,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Economic Columns Analysis</a> 
         <div class="sidebar-tools-main tools-wide">
-    <a href="https://github.com/juba/bookup-html/tree/main/examples/book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
-    <a href="./Economic-Columns-Analysis.epub" title="Download ePub" class="quarto-navigation-tool px-1" aria-label="Download ePub"><i class="bi bi-journal"></i></a>
+    <a href="https://github.com/sorrychoe/economic_analysis" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Economic-Columns-Analysis.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
@@ -215,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#t-sne-with-k-means" id="toc-t-sne-with-k-means" class="nav-link" data-scroll-target="#t-sne-with-k-means"><span class="header-section-number">2.7.2</span> T-SNE with K-means</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/juba/bookup-html/tree/main/examples/book/edit/main/economic_columns_clustering.qmd" class="toc-action">Edit this page</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/sorrychoe/economic_analysis/edit/main/economic_columns_clustering.qmd" class="toc-action">Edit this page</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -914,7 +914,7 @@ outlier['일자'] #아시아경제 기사는 2021년부터 빅카인즈에 기�
 <span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
 <span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="economic_columns_clustering_files/figure-html/cell-21-output-1.png" width="835" height="807"></p>
+<p><img src="economic_columns_clustering_files/figure-html/cell-21-output-1.png" width="836" height="807"></p>
 </div>
 </div>
 </section>
@@ -947,7 +947,7 @@ outlier['일자'] #아시아경제 기사는 2021년부터 빅카인즈에 기�
 <div class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> yellowbrick.cluster <span class="im">import</span> SilhouetteVisualizer</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>kmeans<span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">5</span>, max_iter<span class="op">=</span><span class="dv">1000</span>, random_state<span class="op">=</span><span class="dv">0</span>) <span class="co">#최적 Topic 개수 5개를 기점으로 진행</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>kmeans<span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">5</span>, max_iter<span class="op">=</span><span class="dv">1000</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>visualizer <span class="op">=</span> SilhouetteVisualizer(kmeans, colors<span class="op">=</span><span class="st">'yellowbrick'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="24">
@@ -990,7 +990,7 @@ dtype: int64</code></pre>
 <p>해당 결과를 토대로 PCA와 T-SNE를 진행한 결과는 다음과 같다.</p>
 <section id="pca-with-k-means" class="level3" data-number="2.7.1">
 <h3 data-number="2.7.1" class="anchored" data-anchor-id="pca-with-k-means"><span class="header-section-number">2.7.1</span> PCA with K-means</h3>
-<div class="cell" data-execution_count="26">
+<div class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>pca_df[<span class="st">'cluster'</span>] <span class="op">=</span> labels</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>pca_clu_0 <span class="op">=</span> pca_df[pca_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
@@ -1010,13 +1010,13 @@ dtype: int64</code></pre>
 <span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
 <span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="economic_columns_clustering_files/figure-html/cell-27-output-1.png" width="666" height="466"></p>
+<p><img src="economic_columns_clustering_files/figure-html/cell-28-output-1.png" width="815" height="801"></p>
 </div>
 </div>
 </section>
 <section id="t-sne-with-k-means" class="level3" data-number="2.7.2">
 <h3 data-number="2.7.2" class="anchored" data-anchor-id="t-sne-with-k-means"><span class="header-section-number">2.7.2</span> T-SNE with K-means</h3>
-<div class="cell" data-execution_count="27">
+<div class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>tsne_df[<span class="st">'cluster'</span>] <span class="op">=</span> labels</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>tsne_clu0 <span class="op">=</span> tsne_df[tsne_df[<span class="st">'cluster'</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
@@ -1037,7 +1037,7 @@ dtype: int64</code></pre>
 <span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
 <span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="economic_columns_clustering_files/figure-html/cell-28-output-1.png" width="677" height="468"></p>
+<p><img src="economic_columns_clustering_files/figure-html/cell-29-output-1.png" width="827" height="801"></p>
 </div>
 </div>
 
